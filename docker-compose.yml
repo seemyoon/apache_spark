@@ -1,0 +1,53 @@
+version: '2'
+services:
+    # MASTER
+    master:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        hostname: master
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./data/master:/hdfs
+            - ./test:/tmp/test
+        command: [ "/shell/bootALL.sh", "-d" ]
+        environment:
+            MASTER: spark://master:7077
+            NAMENODE: master
+            SPARK_PUBLIC_DNS: 192.168.100.10
+            CLUSTER_SIZE: 2
+        ports:
+            - "50070:50070"
+            - "8080:8080"
+            - "8888:8888"
+            - "8081:8081"
+            - "9000:9000"
+            - "4040:4040"
+            - "6006:6006"
+    #SLAVE 1
+    slave1:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        hostname: slave1
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /data/slave1:/hdfs
+        command: [ "/shell/bootALL.sh","-d" ]
+        environment:
+            MASTER: spark://master:7077
+            NAMENODE: master
+            SPARK_PUBLIC_DNS: 192.168.100.10
+    slave2:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        hostname: slave2
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./data/slave2:/hdfs
+        command: [ "/shell/bootALL.sh","-d" ]
+        environment:
+            MASTER: spark://master:7077
+            NAMENODE: master
+            SPARK_PUBLIC_DNS: 192.168.100.10
